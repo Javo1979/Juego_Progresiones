@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Constructor de Patrones</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Poppins:wght@700&display=swap');
+
+        :root {
+            --primary-color: #1a1a2e;
+            --secondary-color: #16213e;
+            --accent-color: #0f3460;
+            --highlight-color: #e94560;
+            --text-color: #ffffff;
+            --success-color: #57b894;
+            --hint-color: #fdb838;
+            --error-color: #f85149;
+        }
+
+        body {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            font-family: 'Roboto Mono', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .game-container {
+            background-color: var(--secondary-color);
+            border: 2px solid var(--accent-color);
+            border-radius: 12px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 700px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            color: var(--highlight-color);
+            font-size: 2.8rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 10px var(--highlight-color);
+        }
+        
+        #info-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1rem;
+            color: var(--hint-color);
+            margin-bottom: 1.5rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--accent-color);
+            background-color: var(--primary-color);
+            border-radius: 4px;
+        }
+        
+        #mision-nombre {
+            color: var(--text-color);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            height: 30px;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            margin-top: 1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: #d1d1d1;
+        }
+
+        #respuesta, #tipo-prog-selector, #datos-entrada {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .prog-btn {
+            background-color: var(--accent-color);
+            font-size: 1.1rem;
+            padding: 10px 20px;
+            border: 2px solid transparent;
+        }
+        .prog-btn.selected {
+            border-color: var(--highlight-color);
+            transform: scale(1.1);
+        }
+
+        input[type="number"] {
+            background-color: var(--primary-color);
+            border: 1px solid var(--accent-color);
+            color: var(--text-color);
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.2rem;
+            text-align: center;
+            border-radius: 4px;
+            width: 80px;
+            padding: 8px;
+            transition: all 0.2s ease-in-out;
+            -moz-appearance: textfield;
+        }
+        
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--highlight-color);
+            box-shadow: 0 0 8px var(--highlight-color);
+        }
+
+        button {
+            background-color: var(--highlight-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 5px;
+            padding: 12px 24px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+            margin: 0.5rem;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            background-color: #ff6681;
+        }
+
+        #siguiente-btn {
+            display: none;
+            background-color: #57b894;
+        }
+        #reiniciar-btn { display: none; }
+        
+        #feedback {
+            margin-top: 1.5rem;
+            font-size: 1.1rem;
+            height: 30px;
+            font-weight: bold;
+        }
+
+        .feedback-correct { color: var(--success-color); }
+        .feedback-incorrect { color: var(--error-color); }
+        
+        .progress-bar-container {
+            width: 100%;
+            background-color: var(--primary-color);
+            border-radius: 5px;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--accent-color);
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 20px;
+            background: linear-gradient(90deg, #e94560, #0f3460);
+            border-radius: 5px;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h1>Constructor de Patrones</h1>
+
+        <div id="info-display">
+            <span id="score">Puntuación: 0</span>
+            <span id="streak">Racha: 0x</span>
+        </div>
+        
+        <div class="progress-bar-container">
+            <div id="progress-bar"></div>
+        </div>
+        
+        <h3 id="mision-nombre"></h3>
+        <h2 id="problema"></h2>
+        
+        <div id="tipo-prog-selector">
+            <p>Primero, identifica el tipo de progresión:</p>
+            <div>
+                <button class="prog-btn" data-tipo="aritmetica">Aritmética</button>
+                <button class="prog-btn" data-tipo="geometrica">Geométrica</button>
+            </div>
+        </div>
+        
+        <div id="datos-entrada" class="hidden"></div>
+        <div id="respuesta" class="hidden"></div>
+        
+        <div class="controls">
+            <button id="verificar-btn" class="hidden">Verificar</button>
+            <button id="siguiente-btn">Siguiente Proyecto</button>
+            <button id="reiniciar-btn">Empezar de Nuevo</button>
+        </div>
+        <div id="feedback"></div>
+    </div>
+
+    <script>
+        // Helper function to generate a random integer
+        const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+        const misiones = [
+            {
+                nombre: "Proyecto 1: Gradas de Auditorio",
+                tipo: "aritmetica",
+                generator: () => {
+                    const a1 = randInt(15, 25);
+                    const d = randInt(2, 5);
+                    const n = randInt(12, 20);
+                    const an = a1 + (n - 1) * d;
+                    const sn = Math.round((n * (a1 + an)) / 2);
+                    return {
+                        problema: `Un auditorio tiene ${a1} asientos en la primera fila, ${a1+d} en la segunda, y así sucesivamente. Para un total de ${n} filas, calcula:`,
+                        datosHTML: `<span>a₁=<input type="number" id="a1" value="${a1}" disabled></span> <span>d=<input type="number" id="d" placeholder="?"></span>`,
+                        respuestaHTML: `Asientos en fila ${n}: <input type="number" id="an" placeholder="?"> Capacidad total: <input type="number" id="sn" placeholder="?">`,
+                        verificar: () => document.getElementById('d').value == d && document.getElementById('an').value == an && document.getElementById('sn').value == sn,
+                    };
+                }
+            },
+            {
+                nombre: "Proyecto 2: Plan de Ahorro",
+                tipo: "geometrica",
+                generator: () => {
+                    const a1 = randInt(5, 15);
+                    const r = 2; // Duplicar es clave en el problema original
+                    const n = randInt(6, 9);
+                    const an = a1 * Math.pow(r, n - 1);
+                    const sn = a1 * (Math.pow(r, n) - 1) / (r - 1);
+                    return {
+                        problema: `Mariana ahorra $${a1} el primer mes y duplica la cantidad cada mes. Después de ${n} meses, calcula:`,
+                        datosHTML: `<span>a₁=<input type="number" id="a1" value="${a1}" disabled></span> <span>r=<input type="number" id="r" placeholder="?"></span>`,
+                        respuestaHTML: `Ahorro en mes ${n}: $<input type="number" id="an" placeholder="?"> Ahorro total: $<input type="number" id="sn" placeholder="?">`,
+                        verificar: () => document.getElementById('r').value == r && document.getElementById('an').value == an && document.getElementById('sn').value == sn,
+                    };
+                }
+            },
+            {
+                nombre: "Proyecto 3: Progresión Misteriosa",
+                tipo: "aritmetica",
+                generator: () => {
+                    const a1 = randInt(5, 15);
+                    const d = randInt(2, 6);
+                    const n = randInt(8, 12);
+                    const an = a1 + (n - 1) * d;
+                    const sn = Math.round((n * (a1 + an)) / 2);
+                    return {
+                        problema: `En una progresión aritmética, a₁=${a1} y a${n}=${an}. Encuentra la diferencia y la suma total.`,
+                        datosHTML: ``,
+                        respuestaHTML: `Diferencia (d): <input type="number" id="d" placeholder="?"> Suma (S${n}): <input type="number" id="sn" placeholder="?">`,
+                        verificar: () => document.getElementById('d').value == d && document.getElementById('sn').value == sn,
+                    };
+                }
+            },
+            {
+                nombre: "Proyecto 4: Cultivo de Bacterias",
+                tipo: "geometrica",
+                generator: () => {
+                    const a1 = randInt(40, 60);
+                    const r = 3; // Triplicar es clave
+                    const n_horas = randInt(4, 7);
+                    const an = a1 * Math.pow(r, n_horas);
+                    return {
+                        problema: `Un cultivo con ${a1} bacterias se triplica cada hora. ¿Cuántas habrá después de ${n_horas} horas?`,
+                        datosHTML: `<span>a₁=<input type="number" id="a1" value="${a1}" disabled></span> <span>r=<input type="number" id="r" placeholder="?"></span>`,
+                        respuestaHTML: `Bacterias después de ${n_horas}h: <input type="number" id="an" placeholder="?">`,
+                        verificar: () => document.getElementById('r').value == r && document.getElementById('an').value == an,
+                    };
+                }
+            },
+            {
+                nombre: "Proyecto 5: Depreciación de Automóvil",
+                tipo: "geometrica",
+                generator: () => {
+                    const a1_options = [20000, 25000, 30000];
+                    const r_options = [0.85, 0.90, 0.80]; // 15%, 10%, 20%
+                    const a1 = a1_options[randInt(0, a1_options.length - 1)];
+                    const r = r_options[randInt(0, r_options.length - 1)];
+                    const n_anios = randInt(4, 6);
+                    const an = Math.round(a1 * Math.pow(r, n_anios));
+                    const perdida = Math.round((1 - r) * 100);
+                    return {
+                        problema: `Un auto de $${a1} pierde ${perdida}% de su valor al año. ¿Cuál será su valor después de ${n_anios} años?`,
+                        datosHTML: `<span>a₁=<input type="number" id="a1" value="${a1}" disabled></span> <span>r=<input type="number" step="0.01" id="r" placeholder="?"></span>`,
+                        respuestaHTML: `Valor después de ${n_anios} años: $<input type="number" id="an" placeholder="?">`,
+                        verificar: () => document.getElementById('r').value == r && document.getElementById('an').value == an,
+                    };
+                }
+            }
+        ];
+
+        let misionActual = 0;
+        let misionData = {};
+        let puntuacion = 0;
+        let racha = 0;
+        
+        const misionNombreDisplay = document.getElementById('mision-nombre');
+        const problemaDiv = document.getElementById('problema');
+        const tipoProgSelector = document.getElementById('tipo-prog-selector');
+        const datosEntradaDiv = document.getElementById('datos-entrada');
+        const respuestaDiv = document.getElementById('respuesta');
+        const feedbackDiv = document.getElementById('feedback');
+        const verificarBtn = document.getElementById('verificar-btn');
+        const siguienteBtn = document.getElementById('siguiente-btn');
+        const reiniciarBtn = document.getElementById('reiniciar-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const scoreDisplay = document.getElementById('score');
+        const streakDisplay = document.getElementById('streak');
+        const progBtns = document.querySelectorAll('.prog-btn');
+
+        function updateInfoDisplay() {
+            scoreDisplay.textContent = `Puntuación: ${puntuacion}`;
+            streakDisplay.textContent = `Racha: ${racha}x`;
+        }
+
+        function updateProgressBar() {
+            const progress = (misionActual / misiones.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function cargarMision(index) {
+            const mision = misiones[index];
+            misionData = mision.generator();
+            
+            misionNombreDisplay.textContent = mision.nombre;
+            problemaDiv.textContent = misionData.problema;
+            
+            feedbackDiv.textContent = '';
+            feedbackDiv.className = '';
+            
+            tipoProgSelector.classList.remove('hidden');
+            datosEntradaDiv.classList.add('hidden');
+            respuestaDiv.classList.add('hidden');
+            verificarBtn.classList.add('hidden');
+            siguienteBtn.style.display = 'none';
+            reiniciarBtn.style.display = 'none';
+
+            progBtns.forEach(btn => btn.classList.remove('selected'));
+            updateProgressBar();
+            updateInfoDisplay();
+        }
+
+        progBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tipoSeleccionado = btn.dataset.tipo;
+                const tipoCorrecto = misiones[misionActual].tipo;
+
+                if (tipoSeleccionado === tipoCorrecto) {
+                    puntuacion += 20;
+                    feedbackDiv.textContent = '¡Tipo de progresión correcto!';
+                    feedbackDiv.className = 'feedback-correct';
+                    progBtns.forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    
+                    setTimeout(() => {
+                        tipoProgSelector.classList.add('hidden');
+                        datosEntradaDiv.innerHTML = misionData.datosHTML;
+                        respuestaDiv.innerHTML = misionData.respuestaHTML;
+                        datosEntradaDiv.classList.remove('hidden');
+                        respuestaDiv.classList.remove('hidden');
+                        verificarBtn.classList.remove('hidden');
+                    }, 1000);
+                } else {
+                    racha = 0;
+                    feedbackDiv.textContent = 'Incorrecto. Piensa si se suma o se multiplica.';
+                    feedbackDiv.className = 'feedback-incorrect';
+                }
+                updateInfoDisplay();
+            });
+        });
+
+        verificarBtn.addEventListener('click', () => {
+            if (misionData.verificar()) {
+                racha++;
+                puntuacion += 100 + (racha * 10);
+                feedbackDiv.textContent = '¡Cálculos perfectos! Proyecto avanzado.';
+                feedbackDiv.className = 'feedback-correct';
+                
+                verificarBtn.classList.add('hidden');
+                
+                if (misionActual < misiones.length - 1) {
+                    siguienteBtn.style.display = 'inline-block';
+                } else {
+                    setTimeout(() => {
+                        misionNombreDisplay.textContent = "¡Todos los proyectos completados!";
+                        problemaDiv.textContent = `Tu puntuación final es ${puntuacion}. ¡Eres un maestro constructor!`;
+                        datosEntradaDiv.classList.add('hidden');
+                        respuestaDiv.classList.add('hidden');
+                        reiniciarBtn.style.display = 'inline-block';
+                        misionActual++;
+                        updateProgressBar();
+                    }, 1500);
+                }
+            } else {
+                racha = 0;
+                feedbackDiv.textContent = 'Hay un error en tus cálculos. ¡Revisa los planos!';
+                feedbackDiv.className = 'feedback-incorrect';
+            }
+            updateInfoDisplay();
+        });
+
+        siguienteBtn.addEventListener('click', () => {
+            misionActual++;
+            if (misionActual < misiones.length) {
+                cargarMision(misionActual);
+            }
+        });
+
+        reiniciarBtn.addEventListener('click', () => {
+            misionActual = 0;
+            puntuacion = 0;
+            racha = 0;
+            cargarMision(misionActual);
+        });
+
+        window.onload = () => {
+            cargarMision(misionActual);
+        };
+    </script>
+</body>
+</html>
+
